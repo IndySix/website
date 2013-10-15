@@ -21,7 +21,7 @@ if (!defined('__SITE_PATH'))
  *
  * If this is not set then MartensMVC will guess the protocol, domain and
  * path to your installation. */
-$baseURL = '';
+$baseURL = 'https://server.martens.me/indysix/';
 
 
 /* -------------------------------------------------------------------
@@ -51,8 +51,8 @@ $sessionSaveLocation = __SITE_PATH.'data/sessions/';
  * Sets the default from and reply to mail address
  * 
  */
-$defaultEmail = 'info@indysix.local';
-$defaultEmailName = 'IndySix';
+$defaultEmail = 'info@martens.MCV';
+$defaultEmailName = 'MartensMCV';
 
 
 /* -------------------------------------------------------------------
