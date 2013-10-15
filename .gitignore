@@ -1,1 +1,2 @@
-application/config/*.php
+application/config/*
+data/
