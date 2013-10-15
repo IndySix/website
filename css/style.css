@@ -9,7 +9,7 @@ html {
 	height: 100%;
 }
 body {
-	background: url('https://server.martens.me/indysix/img/bg.png');
+	background: url('../img/bg.png');
 	color: #333;
 	font-size: 14px;
 	line-height: 130%;
