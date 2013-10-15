@@ -86,7 +86,7 @@ class database {
 
         /* check if binds in qeury equals array lenght */
         if ($this->countBinds($query) != count($binds)) {
-            throw new Exception("Binds in qeury are not equal to binds array");
+            throw new Exception("Binds in query are not equal to binds array");
         }
 
         /* prepare statement */
