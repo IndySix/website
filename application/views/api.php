@@ -1,0 +1,1 @@
+<h1>Beat the king API</h1>

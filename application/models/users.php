@@ -26,6 +26,10 @@ class users extends model{
 		if(!empty($data))
 			return $data[0];
 		return null;
+	}
+
+	function getUserByRfid($rfid){
+		return null;
 	} 
 
 	function updateUser($username, $email, $password){

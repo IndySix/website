@@ -2,38 +2,58 @@
 
 class api extends controller {
 	function index(){
-   	
-   	}
+      $this->load->view('api');	
+   }
 
-   	function uploadMovie(){
-   		if(isset($_POST['username'])){
-   			$username 	= $_POST['username'];
-   			$title		= $_POST['title'];
+   function checkinUser(){
+      $this->load->model('users');
+      $this->load->library('JSend');
+      $rfid = $this->uri->segment(3);
 
-   			$this->db->where("username", $username);
-   			$result = $this->db->get("Users");
+      $result = $this->users->getUserByRfid($rfid);
+      if($result != null){
+         $user = new stdClass();
+         $user->username = $result['username'];
+         
+         //get level/challenge object
+         
+         $this->JSend->data = $user;
+      } else {
+         $this->JSend->setStatus(JSend::$FAIL);
+         $this->JSend->data = "There is no user with this rfid!";
+      }
+      echo $this->JSend->getJson();
+   }
 
-   			if(!empty($result) && !empty($title) ){
-   				$this->load->library("upload");
-   				//$this->upload->setValidExtensions("ogg");
-   				$this->upload->loadFile($_FILES["movie"]);
+   	// function uploadMovie(){
+   	// 	if(isset($_POST['username'])){
+   	// 		$username 	= $_POST['username'];
+   	// 		$title		= $_POST['title'];
+
+   	// 		$this->db->where("username", $username);
+   	// 		$result = $this->db->get("Users");
+
+   	// 		if(!empty($result) && !empty($title) ){
+   	// 			$this->load->library("upload");
+   	// 			//$this->upload->setValidExtensions("ogg");
+   	// 			$this->upload->loadFile($_FILES["movie"]);
    				
-   				if($this->upload->uploadFile() ) {
-   					$videofilePath = $this->upload->getFilePath();
-   					$screencapPath = realpath(__SITE_PATH . '/data/uploads/screencap/').'/'.$this->upload->getFileName().'.png';
-   					$cmd = "ffmpeg -i $videofilePath -ss 0 -vframes 5 $screencapPath";
-   					exec($cmd);
+   	// 			if($this->upload->uploadFile() ) {
+   	// 				$videofilePath = $this->upload->getFilePath();
+   	// 				$screencapPath = realpath(__SITE_PATH . '/data/uploads/screencap/').'/'.$this->upload->getFileName().'.png';
+   	// 				$cmd = "ffmpeg -i $videofilePath -ss 0 -vframes 5 $screencapPath";
+   	// 				exec($cmd);
 
-   					$insert['username'] = $username;
-   					$insert['fileName'] = $this->upload->getFileName();
-   					$insert['title']	= $title;
-   					$insert['saved']	= 1;
-   					$this->db->insert("Videos", $insert);
-   					echo "1";
-   					return;
-   				}
-   			}
-   		}
-   		echo "0";
-   	}
+   	// 				$insert['username'] = $username;
+   	// 				$insert['fileName'] = $this->upload->getFileName();
+   	// 				$insert['title']	= $title;
+   	// 				$insert['saved']	= 1;
+   	// 				$this->db->insert("Videos", $insert);
+   	// 				echo "1";
+   	// 				return;
+   	// 			}
+   	// 		}
+   	// 	}
+   	// 	echo "0";
+   	// }
 }
