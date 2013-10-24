@@ -29,6 +29,12 @@ class users extends model{
 	}
 
 	function getUserByRfid($rfid){
+		$sql = "SELECT * FROM Users, User_keys WHERE Users.id = User_keys.user_id AND lower(User_keys.key) = lower(?)";
+		$bind[] = $rfid;
+		$data = $this->db->query($sql, $bind);
+		if(!empty($data)){
+			return $data[0];
+		}
 		return null;
 	} 
 

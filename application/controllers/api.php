@@ -14,10 +14,22 @@ class api extends controller {
       if($result != null){
          $user = new stdClass();
          $user->username = $result['username'];
-         
+
          //get level/challenge object
+         $this->load->model('levels');
+         $level = $this->levels->getLevelById($result['current_level_id']);
+         if($level != null){
+            $user->level = new stdClass();
+            foreach ($level as $key => $value) {
+               if(!is_numeric($key))
+                  $user->level->$key = $value;
+            }
+            $this->JSend->data = $user;
+         } else {
+            $this->JSend->setStatus(JSend::$FAIL);
+            $this->JSend->data = "There is no level selected for current user!";
+         }
          
-         $this->JSend->data = $user;
       } else {
          $this->JSend->setStatus(JSend::$FAIL);
          $this->JSend->data = "There is no user with this rfid!";
