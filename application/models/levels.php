@@ -10,4 +10,16 @@ class levels extends model{
 			return $level[0];
 		return null;
 	}
+
+	public function getCompletedLevelsByLevelId($id, $count = 10){
+		if(!is_numeric($count))
+			$count = 10;
+		$sql = "SELECT Level_completed.*, Users.username as username FROM Level_completed, Users WHERE Users.id = Level_completed.user_id AND level_id = ? ORDER BY score DESC LIMIT 0, ".$count;
+		$bind[] = $id;
+		$data = $this->db->query($sql, $bind);
+		if(!empty($data)){
+			return $data;
+		}
+		return null;
+	}
 }

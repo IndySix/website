@@ -24,6 +24,20 @@ class api extends controller {
                if(!is_numeric($key))
                   $user->level->$key = $value;
             }
+
+            //get top 10 scores
+            $topScores = array();
+            $scores = $this->levels->getCompletedLevelsByLevelId($level['id']);
+            foreach ($scores as $score) {
+               $scoreClass = new stdClass();
+               $scoreClass->username = $score['username'];
+               $scoreClass->score    = $score['score'];
+      
+               $topScores[] = $scoreClass;
+            }
+
+            $user->level->topScores = $topScores;
+
             $this->JSend->data = $user;
          } else {
             $this->JSend->setStatus(JSend::$FAIL);
