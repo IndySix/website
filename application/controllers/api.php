@@ -6,6 +6,7 @@ class api extends controller {
    }
 
    function checkinUser(){
+      header('Access-Control-Allow-Origin: *');
       $this->load->model('users');
       $this->load->library('JSend');
       $rfid = $this->uri->segment(3);
@@ -14,16 +15,34 @@ class api extends controller {
       if($result != null){
          $user = new stdClass();
          $user->username = $result['username'];
+         $user->avatarUrl = baseUrl("data/avatars/".$result['avatar']);
 
          //get level/challenge object
          $this->load->model('levels');
          $level = $this->levels->getLevelById($result['current_level_id']);
+         
          if($level != null){
+            $levelScore = $this->levels->getTopScoreUserLevel($result['id']);
+            $user->levelScore = empty($levelScore) ? 0 : $levelScore['score'];
+            $user->attempt = $this->levels->getLevelAttemptUser($result['id']);
+            
             $user->level = new stdClass();
-            foreach ($level as $key => $value) {
-               if(!is_numeric($key))
-                  $user->level->$key = $value;
-            }
+            //set level info
+            $user->level->levelNumb = $level['order'];
+            $user->level->title = $level['title'];
+            $user->level->description = $level['description'];
+            $user->level->playTime =  (int)$level['play_time'];
+            $user->level->one_star_score = $level['one_star_score'];
+            $user->level->two_star_score = $level['two_star_score'];
+            $user->level->three_star_score = $level['three_star_score'];
+            $user->level->four_star_score = $level['four_star_score'];
+            $user->level->mp4_url = baseUrl("data/videos/".$level['example_movie'].".mp4");
+            $user->level->ogg_url = baseUrl("data/videos/".$level['example_movie'].".ogg");
+
+            // foreach ($level as $key => $value) {
+            //    if(!is_numeric($key))
+            //       $user->level->$key = $value;
+            // }
 
             //get top 10 scores
             $topScores = array();
@@ -49,6 +68,33 @@ class api extends controller {
          $this->JSend->data = "There is no user with this rfid!";
       }
       echo $this->JSend->getJson();
+   }
+
+   function latestResultsParts(){
+      header('Access-Control-Allow-Origin: *');
+      $this->load->model('levels');
+      $this->load->library('JSend');
+      $partName = $this->uri->segment(3);
+
+      $result = $this->levels->getLatestCompletedLevelsByPartName($partName);
+      if($result != null){
+         $array = array();
+         foreach ($result as $items) {
+            $item = new stdClass();
+            foreach ($items as $key => $value) {
+               if (!is_numeric($key)) 
+                  $item->$key = $value;
+            }
+            $array[] = $item;
+         }
+
+         $this->JSend->data = $array;
+      } else {
+         $this->JSend->setStatus(JSend::$FAIL);
+         $this->JSend->data = "The part is not found!";
+      }
+      echo $this->JSend->getJson();
+
    }
 
    	// function uploadMovie(){
