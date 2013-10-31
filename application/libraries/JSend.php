@@ -1,4 +1,4 @@
-<?PHP
+<?PHP if (!defined('__SITE_PATH')) exit('No direct script access allowed');
 class JSend{
         #status
         public static $SUCCESS  = "success";

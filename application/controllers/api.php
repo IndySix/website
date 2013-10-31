@@ -24,7 +24,7 @@ class api extends controller {
          if($level != null){
             $levelScore = $this->levels->getTopScoreUserLevel($result['id']);
             $user->levelScore = empty($levelScore) ? 0 : $levelScore['score'];
-            $user->attempt = $this->levels->getLevelAttemptUser($result['id']);
+            $user->attempt = $this->levels->getLevelAttemptUser($result['id'], $level['id']);
             
             $user->level = new stdClass();
             //set level info
@@ -94,7 +94,61 @@ class api extends controller {
          $this->JSend->data = "The part is not found!";
       }
       echo $this->JSend->getJson();
+   }
 
+   function getKingPart(){
+      header('Access-Control-Allow-Origin: *');
+      $this->load->model('levels');
+      $this->load->library('JSend');
+      $partName = $this->uri->segment(3);
+
+      $this->db->reset();
+      $this->db->where("name",$partName);
+      $result = $this->db->get("Parts");
+
+      if(!empty($result)){
+         $result = $this->levels->getTopUserPartById($result[0]['id']);
+         
+         if($result != null){
+            $user = new stdClass();
+            $user->username = $result['username'];
+            $user->avatarUrl = baseUrl("data/avatars/".$result['avatar']);
+            $user->score   = $result['score'];
+            $this->JSend->data = $user;
+            echo $this->JSend->getJson();
+            return;
+         }
+      } 
+      $this->JSend->setStatus(JSend::$FAIL);
+      $this->JSend->data = "The part is not found!";
+      echo $this->JSend->getJson();
+   }
+
+   function uploadChallengeResult(){
+      if(isset($_POST['result'] )){
+         //check if result is valid and calculate score
+
+         //upload video
+
+         //save result and video in database
+      }
+   }
+
+   function testScore(){
+      header('Access-Control-Allow-Origin: *');
+      $this->load->model('levels');
+      $this->load->library('JSend');
+      $partName = $this->uri->segment(3);
+      $order = $this->uri->segment(4);
+
+      if(!empty($partName) && !empty($order)){
+         $level = $this->levels->getLevelByOrderPartName($partName, $order);
+         if(!empty($level)){
+            $this->load->library('Score');
+            echo $this->Score->grind($level['targetScore'], null);
+         }
+         //print_r($level);
+      }
    }
 
    	// function uploadMovie(){
