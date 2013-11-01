@@ -15,6 +15,7 @@ class api extends controller {
       if($result != null){
          $user = new stdClass();
          $user->username = $result['username'];
+         $user->difficulty = $result['difficulty'];
          $user->avatarUrl = baseUrl("data/avatars/".$result['avatar']);
 
          //get level/challenge object
