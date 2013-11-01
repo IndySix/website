@@ -125,30 +125,56 @@ class api extends controller {
    }
 
    function uploadChallengeResult(){
-      if(isset($_POST['result'] )){
-         //check if result is valid and calculate score
-
-         //upload video
-
-         //save result and video in database
-      }
-   }
-
-   function testScore(){
       header('Access-Control-Allow-Origin: *');
+      $this->load->model('users');
       $this->load->model('levels');
       $this->load->library('JSend');
-      $partName = $this->uri->segment(3);
-      $order = $this->uri->segment(4);
+      
+      $partName   = $this->uri->segment(3);
+      $order      = $this->uri->segment(4);
+      $username   = isset($_POST['username']) ? $_POST['username'] : null;
+      $result     = isset($_POST['result']) ? $_POST['result'] : null;
+      $movie      = isset($_FILES["movie"]) ? $_FILES["movie"] : null;
+      
+      $level = $this->levels->getLevelByOrderPartName($partName, $order);
+      $user = $this->users->getUserByUsername($username);
 
-      if(!empty($partName) && !empty($order)){
-         $level = $this->levels->getLevelByOrderPartName($partName, $order);
-         if(!empty($level)){
-            $this->load->library('Score');
-            echo $this->Score->grind($level['targetScore'], null);
+      if(!empty($level) && !empty($user)){
+         
+         //Calculate score
+         $this->load->library('Score');
+         $score = $this->Score->grind($level['targetScore'], $result);
+
+         //Check if score is positive
+         if($score > 0) {
+            //upload video when uploaded
+            $movieFileName = null;
+            if(!empty($movie)) {
+               $this->load->library("upload");
+               $this->upload->loadFile($movie);
+
+               if($this->upload->uploadFile() ) {
+                  $movieFileName = $this->upload->getFileName();
+               }
+            }
+
+            //Save challenge result
+            $insert['level_id']  = $level['id'];
+            $insert['user_id']   = $user['id'];
+            $insert['score']     = $score;
+            $insert['data']      = $result;
+            $insert['movie']     = $movieFileName;
+            $this->db->insert("Level_completed", $insert);
+
+            $this->JSend->data = $score;
+            echo $this->JSend->getJson();
+            return;
          }
-         //print_r($level);
+
       }
+      $this->JSend->setStatus(JSend::$FAIL);
+      $this->JSend->data = "Failed uplouding challenge!";
+      echo $this->JSend->getJson();
    }
 
    	// function uploadMovie(){
