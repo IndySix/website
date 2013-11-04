@@ -22,10 +22,11 @@ class Score {
 	}
 	
 	function grind($target, $result){
+		$result_obj = json_decode($result);
 		//calculate distance
-		$calcResult['distance'] = rand(3, 6);
+		$calcResult['distance'] = $result_obj->percentage;
 		//calculate speed
-		$calcResult['speed'] = rand(10, 30);
+		$calcResult['speed'] = $result_obj->duration/1000;
 
 		return (int)$this->calculate($target, $calcResult);
 	}
